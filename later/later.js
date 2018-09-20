@@ -86,6 +86,18 @@ module.exports = function (RED) {
                 msg.later.count = 0;
             }
             //If this message has no (or null) payload, stop any running timers
+            if (!msg.payload) {
+                var id;
+                for (id in runningSchedules) {
+                    if (runningSchedules.hasOwnProperty(id)) {
+                        debug("Removing timer : " + id);
+                        runningSchedules[id].clear();
+                    }
+                }
+                runningSchedules = {};
+                return;
+            }
+            //If this message has no (or null) payload, stop any running timers
             //remove this schedule from the list, and do no further processing
             if (!msg.payload && runningSchedules[msg.later.id]) {
                 debug("Removing scheduled timer : " + msg.later.id);
